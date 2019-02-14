@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Product List</title>
+<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+<link href="css/component.css" rel="stylesheet" type="text/css"/>
+<link href="css/login.css" rel="stylesheet" type="text/css"/>
+<script src="js/jquery-1.11.2.min.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="content">
+    <h3 class="form-title">Product List</h3>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Image</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Sales</th>
+                </tr>
+            </thead>
+            <tbody id = "container">
+
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+
+
+<script type="text/javascript">
+
+    var global_product_list = [];
+    jQuery(document).ready(function(){
+            $.ajax({
+                type:"GET",
+                url:"http://localhost:8098/product/list",
+                xhrFields:{withCredentials:true},
+                success:function(data){
+                    if(data.status == "success"){
+                        global_product_list = data.data;
+                        reloadDom();
+                    }else{
+                        alert("Get Product List failed, because "+ data.data.errMsg);
+                    }
+                },
+                error:function(data){
+                    alert("Get Product List Exception, because "+data.responseText);
+                }
+            });
+            
+        });
+
+    function reloadDom(){
+        for(var i = 0; i < global_product_list.length; i++){
+            var productVO = global_product_list[i];
+            var dom = "<tr data-id='"+productVO.id+"'  id='productDetail"+productVO.id+"'><td>"+productVO.name+"</td><td><img style='width:100px;height:auto;' src='"+productVO.imgUrl+"'/></td><td>"+productVO.description+"</td><td>"+productVO.price+"</td><td>"+productVO.stock+"</td><td>"+productVO.sales+"</td></tr>";
+            $("#container").append(dom);
+
+            $("#productDetail"+productVO.id).on("click",function(e){
+                window.location.href = "product_detail.html?id="+$(this).data("id");
+            });
+        }
+    }
+</script>
+</html>
